@@ -117,12 +117,11 @@ class LossCalculation {
                 if(mask != null) temp2.muliColumnVector(mask);
                 scoreArray = temp2;
                 break;
-            case RMSE_XENT:
-                INDArray rmseXentDiff = labels.sub(z);
-                INDArray squaredrmseXentDiff = rmseXentDiff.muli(rmseXentDiff);
-                INDArray sqrt = sqrt(squaredrmseXentDiff);
-                if(mask != null) sqrt.muliColumnVector(mask);
-                scoreArray = sqrt;
+            case RMSE:
+                INDArray mseSq = labels.sub(z);
+                mseSq.muli(mseSq);
+                if(mask != null) mseSq.muliColumnVector(mask);
+                scoreArray = sqrt(mseSq);
                 break;
             case MSE:
                 INDArray mseDeltaSquared = labels.sub(z);

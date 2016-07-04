@@ -93,24 +93,23 @@ public class LossFunctions {
                 INDArray xEntLogZ = log(z);
                 INDArray xEntOneMinusLabelsOut = labels.rsub(1);
                 INDArray xEntOneMinusLogOneMinusZ = log(z).rsubi(1);
-                ret = labels.mul(xEntLogZ).add(xEntOneMinusLabelsOut).muli(xEntOneMinusLogOneMinusZ).sum(1).sumNumber().doubleValue();
+                ret = labels.mul(xEntLogZ).add(xEntOneMinusLabelsOut).muli(xEntOneMinusLogOneMinusZ).sumNumber().doubleValue();
                 break;
-            case RMSE_XENT:
-                INDArray rmseXentDiff = labels.sub(z);
-                INDArray squaredrmseXentDiff = pow(rmseXentDiff, 2.0);
-                INDArray sqrt = sqrt(squaredrmseXentDiff);
-                ret = sqrt.sum(1).sumNumber().doubleValue();
+            case RMSE:
+                INDArray mse = labels.sub(z);
+                //Compensating for the division by n, since it should be divided by sqrt(n)
+                ret = Math.sqrt(mse.mul(mse).sumNumber().doubleValue()*labels.size(0));
                 break;
             case MSE:
                 INDArray mseDelta = labels.sub(z);
-                ret = 0.5 * pow(mseDelta, 2).sum(1).sumNumber().doubleValue();
+                ret = 0.5 * pow(mseDelta, 2).sumNumber().doubleValue();
                 break;
             case EXPLL:
                 INDArray expLLLogZ = log(z);
-                ret = z.sub(labels.mul(expLLLogZ)).sum(1).sumNumber().doubleValue();
+                ret = z.sub(labels.mul(expLLLogZ)).sumNumber().doubleValue();
                 break;
             case SQUARED_LOSS:
-                ret = pow(labels.sub(z), 2).sum(1).sumNumber().doubleValue();
+                ret = pow(labels.sub(z), 2).sumNumber().doubleValue();
                 break;
             case NEGATIVELOGLIKELIHOOD:
                 INDArray sums2 = log(z);
@@ -137,7 +136,7 @@ public class LossFunctions {
      * EXPLL: Exponential log likelihood: Poisson Regression
      * XENT: Cross Entropy: Binary Classification
      * MCXENT: Multiclass Cross Entropy
-     * RMSE_XENT: RMSE Cross Entropy
+     * RMSE: Root mean squared error
      * SQUARED_LOSS: Squared Loss
      * RECONSTRUCTION_CROSSENTROPY: Reconstruction Cross Entropy
      * NEGATIVELOGLIKELIHOOD: Negative Log Likelihood
@@ -148,7 +147,7 @@ public class LossFunctions {
         EXPLL,
         XENT,
         MCXENT,
-        RMSE_XENT,
+        RMSE,
         SQUARED_LOSS,
         RECONSTRUCTION_CROSSENTROPY,
         NEGATIVELOGLIKELIHOOD,
